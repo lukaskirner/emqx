@@ -235,12 +235,12 @@ process(?CONNECT_PACKET(Var), State0) ->
                     end;
                 {error, Reason} ->
                     case Reason of
-                        StatusCode when StatusCode >= 500, StatusCode =< 599 ->
-                            ?LOG(error, "Username '~s' login failed due to server error. statusCode ~p", [Username, StatusCode], State1),
-                            {?CONNACK_SERVER, false, State1};
+                        StatusCode when StatusCode == 403 ->
+                            ?LOG(error, "Username '~s' login failed. result ~p", [Username, StatusCode], State1),
+                            {?CONNACK_CREDENTIALS, false, State1};
                         _Else ->
-                            ?LOG(error, "Username '~s' login failed. result ~p", [Username, Reason], State1),
-                            {?CONNACK_CREDENTIALS, false, State1}
+                            ?LOG(error, "Username '~s' login failed due to server error. statusCode ~p", [Username, Reason], State1),
+                            {?CONNACK_SERVER, false, State1}
                     end
             end;
         ReturnCode ->
